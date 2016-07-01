@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceCategory
+    android:title="@string/dialogTitle">
+    <ListPreference
+        android:key="displayType"
+        android:entries="@array/displayType"
+        android:entryValues="@array/displayTypeValues" />
+</PreferenceCategory>
+</PreferenceScreen>
