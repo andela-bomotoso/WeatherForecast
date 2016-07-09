@@ -8,4 +8,12 @@
         <item>Current Location</item>
         <item>Custom Location</item>
     </string-array>
+    <string-array name="temperature">
+        <item>Celsius</item>
+        <item>Fahrenheit</item>
+    </string-array>
+    <string-array name="forecastNumber">
+        <item>7</item>
+        <item>14</item>
+    </string-array>
 </resources>

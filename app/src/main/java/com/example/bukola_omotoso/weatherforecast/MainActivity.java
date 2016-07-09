@@ -39,18 +39,22 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity  {
+    private SharedPreferences sharedPreferences;
+    private final String TEMPERATURE = "temperature";
+    private  final String FORECAST_LOCATION = "forecast_location";
+    private  final String FORECAST_NUMBER = "forecast_number";
+    private boolean preferenceChanged = true;
     private List<Weather> weatherList = new ArrayList<>();
     private WeatherArrayAdapter weatherArrayAdapter;
     private ListView weatherListView;
     private URL url;
     private EditText locationEditText;
     private FloatingActionButton fab;
-    private String displayType;
-    private SharedPreferenceManager sharedPreferenceManager;
+    private String displayType = "";
+    private String temperature = "";
+    private String forecastNum = "";
+    private int forecastNumber = 0;
     private LocationDetector locationDetector;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,49 +64,50 @@ public class MainActivity extends AppCompatActivity  {
         setSupportActionBar(toolbar);
         locationEditText = (EditText)findViewById(R.id.locationEditText);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        sharedPreferenceManager = new SharedPreferenceManager(this);
-
-        displayType = sharedPreferenceManager.retrieveDisplayType();
 
         weatherListView = (ListView)findViewById(R.id.weatherListView);
         weatherArrayAdapter = new WeatherArrayAdapter(this,weatherList);
         weatherListView.setAdapter(weatherArrayAdapter);
 
-        locationDetector = new LocationDetector();
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        displayType = sharedPreferences.getString(FORECAST_LOCATION, Constants.DISPLAY_DEFAULT);
+        temperature = sharedPreferences.getString(TEMPERATURE,Constants.DEFAULT_TEMPERATURE);
+        forecastNum = sharedPreferences.getString(FORECAST_NUMBER,"");
+        forecastNumber = Integer.parseInt(sharedPreferences.getString(FORECAST_NUMBER,"7"));
 
-        if(displayType == Constants.DISPLAY_DEFAULT)    {
+        Log.e("FORECAST_NUMBER",forecastNum);
+
+        if (displayType .equals( Constants.DISPLAY_DEFAULT)) {
             fab.setVisibility(View.GONE);
             locationEditText.setVisibility(View.GONE);
             URL url = createURL(Constants.DISPLAY_LOCATION);
-            Log.e("URL",url.toString());
-            if(url != null )    {
-               // dismissKeyboard(locationEditText);
-                Snackbar.make(findViewById(R.id.coordinator_layout),Constants.DISPLAY_LOCATION+" weather forecast",Snackbar.LENGTH_LONG).show();
+            Log.e("URL", url.toString());
+            if (url != null) {
+                // dismissKeyboard(locationEditText);
+                Snackbar.make(findViewById(R.id.coordinator_layout), Constants.DISPLAY_LOCATION + " weather forecast", Snackbar.LENGTH_LONG).show();
                 GetWeatherTask getWeatherTask = new GetWeatherTask();
                 getWeatherTask.execute(url);
-            }   else    {
-                Snackbar.make(findViewById(R.id.coordinator_layout),R.string.invalid_url,Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(findViewById(R.id.coordinator_layout), R.string.invalid_url, Snackbar.LENGTH_LONG).show();
 
             }
-        }else{
+        } else {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     URL url = createURL(locationEditText.getText().toString());
-                    Log.e("URL",url.toString());
-                    if(url != null )    {
+                    Log.e("URL", url.toString());
+                    if (url != null) {
                         dismissKeyboard(locationEditText);
-                        Snackbar.make(findViewById(R.id.coordinator_layout),locationEditText.getText()+" weather forecast",Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(findViewById(R.id.coordinator_layout), locationEditText.getText() + " weather forecast", Snackbar.LENGTH_LONG).show();
                         GetWeatherTask getWeatherTask = new GetWeatherTask();
                         getWeatherTask.execute(url);
-                    }   else    {
-                        Snackbar.make(findViewById(R.id.coordinator_layout),R.string.invalid_url,Snackbar.LENGTH_LONG).show();
+                    } else {
+                        Snackbar.make(findViewById(R.id.coordinator_layout), R.string.invalid_url, Snackbar.LENGTH_LONG).show();
                     }
                 }
             });
         }
-
-
     }
 
     @Override
@@ -115,14 +120,9 @@ public class MainActivity extends AppCompatActivity  {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)  {
-        switch (item.getItemId())   {
-            case R.id.action_settings:
-                Intent intent = new Intent(this,SettingsActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+        startActivity(preferencesIntent);
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -134,9 +134,14 @@ public class MainActivity extends AppCompatActivity  {
     private URL createURL(String city)  {
         String apiKey = getString(R.string.api_key);
         String baseUrl = getString(R.string.web_service_url);
-        //city = Constants.DISPLAY_LOCATION;
         try {
-            String urlString = baseUrl + URLEncoder.encode(city,"UTF-8") + "&units=metric&APPID=" + apiKey;
+            String temp = "";
+            if(temperature .equals("Celsius"))  {
+                temp = "metric";
+            }else{
+                temp = "imperial";
+            }
+            String urlString = baseUrl + URLEncoder.encode(city,"UTF-8") + "&units="+temp+"&cnt="+forecastNumber+"&APPID=" + apiKey;
             return new URL(urlString);
         }   catch (Exception e) {
             e.printStackTrace();
@@ -144,12 +149,7 @@ public class MainActivity extends AppCompatActivity  {
         return null;
     }
 
-    public void onLocationChanged(Location location) {
 
-        Constants.DISPLAY_LOCATION = (locationDetector.fetchStreetName(this, location.getLatitude(), location.getLongitude()));
-        sharedPreferenceManager.saveLatitude((float)location.getLatitude());
-        sharedPreferenceManager.saveLongitude((float)location.getLongitude());
-    }
 
 
     private class GetWeatherTask extends AsyncTask<URL, Void, JSONObject>   {
@@ -223,6 +223,7 @@ public class MainActivity extends AppCompatActivity  {
         }
 
     }
+
 
 
 

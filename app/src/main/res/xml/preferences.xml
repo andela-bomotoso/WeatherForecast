@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory
-    android:title="@string/dialogTitle">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<ListPreference
+    android:entries="@array/temperature"
+    android:entryValues="@array/temperature"
+    android:key="temperature"
+    android:title="Forecast Temperature"
+    android:summary="Celsius or Fahrenheit"
+    android:persistent="true"
+    android:defaultValue="Celsius"/>
+
     <ListPreference
-        android:key="displayType"
         android:entries="@array/displayType"
-        android:entryValues="@array/displayTypeValues" />
-</PreferenceCategory>
+        android:entryValues="@array/displayType"
+        android:key="forecast_location"
+        android:title="Forecast Location"
+        android:persistent="true"
+        android:summary="Custom or Current Location"
+        android:defaultValue="Current"/>
+
+    <ListPreference
+        android:entries="@array/forecastNumber"
+        android:entryValues="@array/forecastNumber"
+        android:key="forecast_number"
+        android:title="Number of Forecast"
+        android:summary="7 or 14"
+        android:persistent="true"
+        android:defaultValue="7"/>
 </PreferenceScreen>

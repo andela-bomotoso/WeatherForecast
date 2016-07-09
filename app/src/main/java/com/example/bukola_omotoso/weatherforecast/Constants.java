@@ -10,6 +10,7 @@ public class Constants {
     public static final String DISPLAY_DEFAULT = "Current Location";
     public static final String DISPLAY_CUSTOM = "Custom Location";
     public static String DISPLAY_LOCATION = "Lagos";
+    public static String DEFAULT_TEMPERATURE="Celsius";
 }
 
 
